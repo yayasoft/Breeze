@@ -1,7 +1,7 @@
 ﻿/*
  * Breeze Labs: Breeze Directives for Angular Apps
  *
- *  v.1.3.5
+ *  v.1.3.7
  *
  *  Usage:
  *     Make this module a dependency of your app module:
@@ -47,13 +47,13 @@
             restrict: 'A',
             require: 'ngModel',
 
-            link: function(scope, elm, attr, ngModelCtrl) {
+            link: function (scope, elm, attr, ngModelCtrl) {
                 if (attr.type === 'radio' || attr.type === 'checkbox') return;
                 ngModelCtrl.$formatters.push(equivalenceFormatter);
-                
-                function equivalenceFormatter(value){
-                   var viewValue = ngModelCtrl.$viewValue // could have used 'elm.val()'
-                   return (value === +viewValue) ? viewValue : value;
+
+                function equivalenceFormatter(value) {
+                    var viewValue = ngModelCtrl.$viewValue // could have used 'elm.val()'
+                    return (value === +viewValue) ? viewValue : value;
                 }
             }
         };
@@ -96,7 +96,7 @@
         var directive = {
             link: link,
             restrict: 'A',
-            scope: true
+            scope: false
         };
 
         return directive;
@@ -107,6 +107,7 @@
                 scope,
                 attrs.ngModel,
                 attrs.zValidate);
+            scope.loaded = false;
 
             if (!info.getValErrs) { return; } // can't do anything
 
@@ -123,11 +124,38 @@
                 var valTemplate = config.zValidateTemplate;
                 var requiredTemplate = config.zRequiredTemplate || '';
                 var decorator = angular.element('<span class="z-decorator"></span>');
-                element.after(decorator);
+                
+                // YTour warning tooltip
+                var warning = angular.element('<span class="z-warning"></span>');
+
+                
+                warning.append(decorator);
+                // element.before(decorator);
+
+                /* YTour snippet for desgn changes
+                 * 
+                 * Registering on 'mouseover' and 'mouseout' events for tooltip show triggering
+                 * Also, calculating 'margin-top' for "!" sign because we have different heights for inputs
+                 */
+
+                warning.on('mouseover',{decorator: decorator}, function(evt) {
+                    evt.data.decorator.addClass('show-tooltip');
+                });
+                warning.on('mouseout',{decorator: decorator} , function(evt) {
+                    evt.data.decorator.removeClass('show-tooltip');
+                });
+                var marginTop = (element.height() - 12) / 2 + 1;
+                warning.css('margin-top', marginTop);
+
+                /* end of changes*/
+
+                element.after(warning);
 
                 // unwrap bound elements
                 decorator = decorator[0];
                 scope.$watch(info.getValErrs, valErrsChanged);
+                
+                
 
                 // update the message in the validation template
                 // when a validation error changes on an input control 
@@ -139,11 +167,38 @@
                         /* only works in HTML 5. Maybe should throw if not available. */
                         domEl.setCustomValidity(newValue);
                     }
-
                     var errorHtml = newValue ? valTemplate.replace(/%error%/, newValue) : "";
                     var isRequired = info.getIsRequired();
                     var requiredHtml = isRequired ? requiredTemplate : '';
-                    decorator.innerHTML = (isRequired || !!errorHtml) ? requiredHtml + errorHtml : "";
+                    // decorator.innerHTML = (isRequired || !!errorHtml) ? requiredHtml + errorHtml : "";
+
+
+                    /* YTour snippet for desgn changes
+                     * 
+                     * Marks required fields with upper left corner red sign
+                     * puts "!" sign on input error and triggers show tooltip on hover
+                     */
+                    decorator.innerHTML = (isRequired || !!errorHtml) ?  errorHtml : "";
+                    if(element[0].value == "" && isRequired){
+                        element.addClass('z-valid-mark');
+                        warning.removeClass('show-warning');
+                        element.removeClass('z-input-invalid');
+                    } else {
+                        if(errorHtml != ""){
+                            var invalid = $(decorator).find('.invalid')[0];
+                            var arrow = $(invalid).find('.invalid-arrow-down')[0];
+                            $(arrow).css('margin-top', $(invalid).height() );
+                            $(invalid).css('margin-top', -1 * ($(invalid).height() + 10));
+                            warning.addClass('show-warning');
+                            element.addClass('z-input-invalid');
+                        } else {
+                            warning.removeClass('show-warning');
+                            element.removeClass('z-input-invalid');
+                        }
+                        element.removeClass('z-valid-mark');
+                    }
+
+                    /* end of changes*/
                 }
             }
 
@@ -402,7 +457,7 @@
     function zDirectivesConfig() {
         // The default zValidate template for display of validation errors
         this.zValidateTemplate =
-            '<span class="invalid">%error%</span>';
+            '<span class="invalid"><div class="invalid-arrow-down"></div>%error%</span>';
 
         // The default template for indicating required fields.
         // Assumes "icon-asterisk-invalid" from bootstrap css

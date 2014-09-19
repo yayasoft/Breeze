@@ -1,8 +1,8 @@
 ﻿/*
  * CSS to accompany the breeze.directives
- * such as breeze.directives.validation.js
+ * such as breeze.directives.js
  *
- * v.1.3
+ * v.1.3.7
  *
  * Copyright 2014 IdeaBlade, Inc.  All Rights Reserved.  
  * Licensed under the MIT License
@@ -33,46 +33,85 @@ select + .z-decorator > .z-required {
 .invalid {
     position: absolute;
     display: none;
-    -moz-min-width: 200px;
-    -ms-min-width: 200px;
-    -o-min-width: 200px;
-    -webkit-min-width: 200px;
-    min-width: 200px;
+    -moz-min-width: 150px;
+    -ms-min-width: 150px;
+    -o-min-width: 150px;
+    -webkit-min-width: 150px;
+    min-width: 150px;
     min-height: 20px;
     max-width: 450px;
     max-height: 40px;
 }
 
 input:invalid,
+textarea: invalid,
 select:invalid {
     border: red solid 1px !important;
     border-left: 5px solid red !important;
 }
 span.z-decorator span.invalid,
-    input:invalid + .z-decorator > .invalid,
-    select:invalid + .z-decorator > .invalid {
-        visibility: visible;
-        display: inline-block;
-        background-color: rgb(189, 54, 47);
-        margin: 0.3em 0 0 1em;
-        padding: 4px 10px;
-        -ms-border-radius: 3px 3px 3px 3px !important;
-        border-radius: 3px 3px 3px 3px !important;
-        background-position: 15px center;
-        background-repeat: no-repeat;
-        -webkit-box-shadow: 0 0 12px #999999;
-        -ms-box-shadow: 0 0 12px #999999;
-        box-shadow: 0 0 12px #999999;
-        color: #ffffff;
-        -ms-opacity: 0.8;
-        opacity: 0.8;
-        z-index: 20;
-    }
+input:invalid + .z-decorator > .invalid,
+textarea:invalid + .z-decorator > .invalid,
+select:invalid + .z-decorator > .invalid {
+    opacity: 0;
+    display: inline-block;
+    background-color: #ffface;
+    margin: 0.3em 0 0 1em;
+    padding: 0 5px 0 0;
+    margin-right: -100px;
+    border-radius: 3px 3px 3px 3px !important;
+    background-position: 15px center;
+    background-repeat: no-repeat;
+    -ms-box-shadow: 1px 1px 3px #999999;
+    box-shadow: 1px 1px 3px #999999;
+    color: #515151;
+    z-index: 20;
+    -webkit-transition: opacity 0.6s ease-out;
+            transition: opacity 0.6s ease-out;
+    z-index: -1000;
 
-    select:invalid + .z-decorator > .invalid {
-        margin: 0.1em 0 0 1em;
-    }
+}
+.show-tooltip > .invalid {
+    opacity: 1 !important;
+    z-index: 9999 !important;
+}
+
+select:invalid + .z-decorator > .invalid {
+    margin: 0.1em 0 0 1em;
+}
 .invalid > i {
     margin-right: 8px;
 }
+.invalid-arrow-down {
+    width: 0; 
+    height: 0; 
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    
+    border-top: 5px solid #ffface;
+    position: absolute;
+    /*margin-top: 20px;*/
+    margin-right: 63%;
+}
 /*#endregion */
+
+.z-warning {
+    
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    margin-right: -20px;
+    z-index: -1000;
+}
+.show-warning{
+    background-image: url(images/z-validate-warning.png);
+    cursor: pointer;
+    z-index: 1000;
+}
+.z-valid-mark{
+    background-image: url(images/z-validate-mark.png);
+    background-repeat: no-repeat;
+}
+.z-input-invalid{
+    border-color: #ed1c24;
+}
